@@ -1,3 +1,5 @@
+using MST.User.Webapi;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +8,13 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<HandlerA>();
+builder.Services.AddScoped<HandlerB>();
+builder.Services.AddHttpClient("MyClient", options => {
+        options.BaseAddress = new Uri("https://www.baidu.com");
+    })
+    .AddHttpMessageHandler<HandlerA>()
+    .AddHttpMessageHandler<HandlerB>();
 
 var app = builder.Build();
 
