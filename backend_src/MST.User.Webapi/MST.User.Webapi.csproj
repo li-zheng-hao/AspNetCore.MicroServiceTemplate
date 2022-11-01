@@ -11,4 +11,13 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\MST.Infra.CacheProvider\MST.Infra.CacheProvider.csproj" />
+      <ProjectReference Include="..\MST.Infra.FileProvider\MST.Infra.FileProvider.csproj" />
+      <ProjectReference Include="..\MST.Infra.Rpc\MST.Infra.Rpc.csproj" />
+      <ProjectReference Include="..\MST.Infra.Shared\MST.Infra.Shared.csproj" />
+      <ProjectReference Include="..\MST.Infra.Snowflake\MST.Infra.Snowflake.csproj" />
+      <ProjectReference Include="..\MST.Infra.Utility\MST.Infra.Utility.csproj" />
+    </ItemGroup>
+
 </Project>

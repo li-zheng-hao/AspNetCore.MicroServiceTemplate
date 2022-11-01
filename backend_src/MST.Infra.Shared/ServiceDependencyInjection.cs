@@ -6,8 +6,10 @@ using FreeRedis;
 using FreeSql;
 using FreeSql.Internal;
 using Mapster;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -128,17 +130,20 @@ public static class ServiceDependencyInjection
 
     #region refitclient 微服务间调用
 
-    public static IServiceCollection AddRefitClient<TRestClient>(this IServiceCollection collection,
-        List<IAsyncPolicy<HttpResponseMessage>> policies) where TRestClient : class
+    public static IServiceCollection AddCustomRefitClient<TRestClient>(this IServiceCollection collection,
+        List<IAsyncPolicy<HttpResponseMessage>> policies,string serviceName) where TRestClient : class
     {
+        collection.TryAddScoped<TokenDelegatingHandler>();
+        collection.TryAddScoped<NacosDiscoverDelegatingHandler>();
         var refitSettings = new RefitSettings();
         refitSettings.ContentSerializer = new NewtonsoftJsonContentSerializer();
-        collection.AddRefitClient<TRestClient>(refitSettings).SetHandlerLifetime(TimeSpan.FromMinutes(2))
+        var clientBuilder = collection.AddRefitClient<TRestClient>(refitSettings).SetHandlerLifetime(TimeSpan.FromMinutes(2))
             .AddPolicyHandlerICollection(policies)
             // 配置Token
             .AddHttpMessageHandler<TokenDelegatingHandler>()
             // 配置Handler
             .AddHttpMessageHandler<NacosDiscoverDelegatingHandler>();
+        clientBuilder.ConfigureHttpClient(client => client.BaseAddress = new Uri(serviceName));
         return collection;
     }
 
@@ -147,7 +152,7 @@ public static class ServiceDependencyInjection
     #region 日志配置
 
     public static IServiceCollection AddCustomSerilog(this IServiceCollection collection, IHostBuilder hostBuilder,
-        IConfiguration configuration, IHostingEnvironment environment)
+        IConfiguration configuration, IWebHostEnvironment environment)
     {
         var section = configuration.GetSection("ElasticSearch");
         if (section is null)
