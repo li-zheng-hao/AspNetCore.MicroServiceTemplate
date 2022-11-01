@@ -1,23 +1,22 @@
 ﻿using FreeRedis;
 using Microsoft.Extensions.DependencyInjection;
+using MST.Infra.CacheProvider.KeyGenerator;
+using Newtonsoft.Json;
 using Rougamo;
 using Rougamo.Context;
 
 namespace MST.Infra.CacheProvider.Interceptor;
 
 [AttributeUsage(AttributeTargets.Method,AllowMultiple = false,Inherited = false)]
-public class CachingEnableAttribute:MoAttribute
+public class CachingEnableAttribute:MoAttribute,IDisposable
 {
-    /// <summary>
-    /// 所有的接口缓存的前缀
-    /// </summary>
-    public const string METHOD_CACHE_PREFIX = "methodcache";
-    
-    static IServiceProvider _serviceProvider = new IServiceProvider();
+    private static IServiceProvider _serviceProvider;
 
     private IServiceScope _scope;
     private ICacheProvider _cacheProvider;
     private readonly IRedisClient _redisClient;
+    private readonly ICacheKeyGenerator _cachingKeyGenerator;
+    private RedisClient.LockController _lockController;
 
     // 启动时需要注入根服务器
     public static void SetServiceProvider(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
@@ -28,6 +27,7 @@ public class CachingEnableAttribute:MoAttribute
         _cacheProvider = _scope.ServiceProvider.GetRequiredService<ICacheProvider>();
         _cacheProvider = _scope.ServiceProvider.GetRequiredService<ICacheProvider>();
         _redisClient = _scope.ServiceProvider.GetRequiredService<IRedisClient>();
+        _cachingKeyGenerator = _scope.ServiceProvider.GetRequiredService<ICacheKeyGenerator>();
     }
 
     public string CacheKey { get; set; }
@@ -36,7 +36,7 @@ public class CachingEnableAttribute:MoAttribute
     {
         
         if (string.IsNullOrWhiteSpace(CacheKey))
-            CacheKey = GenerateCacheKey(context);
+            CacheKey = _cachingKeyGenerator.GeneratorKey(context);
         if (_redisClient.Exists(CacheKey))
         {
             var resStr = _redisClient.Get(CacheKey);
@@ -62,7 +62,7 @@ public class CachingEnableAttribute:MoAttribute
 
     public override void OnException(MethodContext context)
     {
-        _scope.Dispose();
+        this.Dispose();
     }
 
     public override void OnSuccess(MethodContext context)
@@ -78,10 +78,15 @@ public class CachingEnableAttribute:MoAttribute
             }
             finally
             {
-                _scope.Dispose();
+                this.Dispose();
             }
         }
     }
 
-   
+
+    public void Dispose()
+    {
+        _scope.Dispose();
+        _lockController.Dispose();
+    }
 }

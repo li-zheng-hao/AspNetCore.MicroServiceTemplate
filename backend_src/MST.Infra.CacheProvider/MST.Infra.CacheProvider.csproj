@@ -15,4 +15,8 @@
       <PackageReference Include="Rougamo.Fody" Version="1.2.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\MST.Infra.Utility\MST.Infra.Utility.csproj" />
+    </ItemGroup>
+
 </Project>

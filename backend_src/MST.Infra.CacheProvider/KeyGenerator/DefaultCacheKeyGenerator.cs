@@ -1,10 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using MST.Infra.Utility.Helper;
+using Newtonsoft.Json;
 using Rougamo.Context;
 
 namespace MST.Infra.CacheProvider.KeyGenerator;
 
-public class DefaultCachingKeyGenerator:ICachingKeyGenerator
+public class DefaultCacheKeyGenerator:ICacheKeyGenerator
 {
+    public string METHOD_CACHE_PREFIX { get; } = "methodcache";
+
     public string GeneratorKey(string customKey)
     {
         throw new NotImplementedException();

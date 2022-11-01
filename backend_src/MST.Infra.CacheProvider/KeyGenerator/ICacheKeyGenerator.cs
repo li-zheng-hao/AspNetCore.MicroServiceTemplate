@@ -2,8 +2,12 @@
 
 namespace MST.Infra.CacheProvider.KeyGenerator;
 
-public interface ICachingKeyGenerator
+public interface ICacheKeyGenerator
 {
+    /// <summary>
+    /// 所有的接口缓存的前缀
+    /// </summary>
+    public string METHOD_CACHE_PREFIX { get;  }
     /// <summary>
     /// 根据自定义的key生成缓存key
     /// </summary>

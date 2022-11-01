@@ -18,7 +18,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MST.Infra.Utility", "MST.In
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AuthService", "AuthService", "{0FC27E0B-0F2B-4A54-8E92-189BA5D55590}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MST.Infra.IdGenerator", "MST.Infra.IdGenerator\MST.Infra.IdGenerator.csproj", "{91015721-AE54-4F28-9224-FE2BC66502CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MST.Infra.Snowflake", "MST.Infra.Snowflake\MST.Infra.Snowflake.csproj", "{91015721-AE54-4F28-9224-FE2BC66502CA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MST.Auth.Webapi", "MST.Auth.Webapi\MST.Auth.Webapi.csproj", "{22FAE0BC-14C3-4196-A8AC-AED93191647A}"
 EndProject
