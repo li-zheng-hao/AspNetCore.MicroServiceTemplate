@@ -14,6 +14,8 @@
       <PackageReference Include="FreeRedis" Version="1.0.2" />
       <PackageReference Include="FreeSql.Provider.MySqlConnector" Version="3.2.682" />
       <PackageReference Include="FreeSql.Repository" Version="3.2.682" />
+      <PackageReference Include="IdentityServer4" Version="4.1.2" />
+      <PackageReference Include="IdentityServer4.AspNetIdentity" Version="4.1.2" />
       <PackageReference Include="Mapster" Version="7.3.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.10" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
