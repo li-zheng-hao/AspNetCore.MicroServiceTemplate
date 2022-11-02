@@ -18,6 +18,9 @@ namespace MST.Infra.Shared.HttpHandler
             if (currentUri is null)
                 throw new NullReferenceException(nameof(request.RequestUri));
             // TODO 这里配置注册发现
+            var realRequestUri = new Uri($"{currentUri.Scheme}://localhost:5000{currentUri.PathAndQuery}");
+            request.RequestUri = realRequestUri;
+            _logger.LogDebug($"RequestUri:{request.RequestUri}");
             // var discoverProvider = new DiscoverProviderBuilder(_consulClient)
             //                                                 .WithCacheSeconds(5)
             //                                                 .WithServiceName(currentUri.Host)

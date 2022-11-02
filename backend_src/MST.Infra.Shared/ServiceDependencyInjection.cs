@@ -114,13 +114,14 @@ public static class ServiceDependencyInjection
             p.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             //不使用驼峰样式的key
             //p.SerializerSettings.ContractResolver = new DefaultContractResolver();
-
+            p.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             p.SerializerSettings.DateFormatString = "yyyy/MM/dd HH:mm:ss";
         });
         JsonConvert.DefaultSettings = () => new JsonSerializerSettings
         {
             Formatting = Formatting.Indented,
             ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             DateFormatString = "yyyy/MM/dd HH:mm:ss",
         };
         return mvcBuilder;
@@ -143,7 +144,7 @@ public static class ServiceDependencyInjection
             .AddHttpMessageHandler<TokenDelegatingHandler>()
             // 配置Handler
             .AddHttpMessageHandler<NacosDiscoverDelegatingHandler>();
-        clientBuilder.ConfigureHttpClient(client => client.BaseAddress = new Uri(serviceName));
+        clientBuilder.ConfigureHttpClient(client => client.BaseAddress = new Uri("http://service-name"));
         return collection;
     }
 
@@ -179,7 +180,7 @@ public static class ServiceDependencyInjection
                 , rollingInterval: RollingInterval.Day
                 , outputTemplate: OUTPUT_TEMPLATE);
         // 如果有elasticsearch则写入
-        if (elasticSearchOptions.Url.IsNotNullOrWhiteSpace())
+        if (elasticSearchOptions?.Url?.IsNotNullOrWhiteSpace()==true)
             config.WriteTo.Elasticsearch(
                 new ElasticsearchSinkOptions(
                         new Uri(configuration["ElasticSearchUrl"])) // for the docker-compose implementation
@@ -355,7 +356,7 @@ public static class ServiceDependencyInjection
                 BearerFormat = "JWT"
             });
             // 接口文档抓取
-            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlFile = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             //... and tell Swagger to use those XML comments.
             c.IncludeXmlComments(xmlPath, true);

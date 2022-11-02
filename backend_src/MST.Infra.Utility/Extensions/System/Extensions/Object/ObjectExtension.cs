@@ -1,4 +1,6 @@
-﻿namespace System;
+﻿using Newtonsoft.Json;
+
+namespace System;
 
 public static class ObjectExtension
 {
@@ -13,5 +15,18 @@ public static class ObjectExtension
             return string.Empty;
 
         return source.ToString()??string.Empty;
+    }
+    /// <summary>
+    /// 转换成json字符串
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string ToJsonString(this object? source)
+    {
+        if (source is null)
+            return string.Empty;
+        if (source is string s)
+            return s;
+        return JsonConvert.SerializeObject(source);
     }
 }

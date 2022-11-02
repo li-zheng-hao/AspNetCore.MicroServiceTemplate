@@ -10,7 +10,7 @@ public interface IAuthRestClient : IRestClient
     /// </summary>
     /// <returns></returns>
     [Post("/connect/token")]
-    Task<ApiResponse<LoginResponseDto>> LoginAsync(LoginRequestDto loginRequest);
+    Task<ApiResponse<LoginResponseDto>> LoginAsync([Body(BodySerializationMethod.UrlEncoded)]LoginRequestDto loginRequest);
 
     
 }

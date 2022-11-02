@@ -1,4 +1,5 @@
-﻿using MST.Infra.Rpc.Rest;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using MST.Infra.Rpc.Rest;
 using MST.Infra.Shared;
 using Refit;
 
@@ -14,6 +15,13 @@ public static class CustomApplicationBuilder
         builder.Services.AddCustomSwaggerGen();
         var policies = PollyPolicyManager.GenerateDefaultPolicies(builder.Environment);
         builder.Services.AddCustomRefitClient<IAuthRestClient>(policies,ServiceConsts.AuthServiceName);
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)//ids颁发的是jwt token，这里要填对应的方案
+            .AddIdentityServerAuthentication(option =>
+            {
+                option.Authority = "http://localhost:5000"; // AuthService的地址
+                option.ApiName = "UserApi"; // 和ids上配置的ApiResource要一样
+                option.RequireHttpsMetadata = false;
+            });
         return builder;
     }
     public static IMvcBuilder ConfigureCustomMvcService(this IMvcBuilder builder)
