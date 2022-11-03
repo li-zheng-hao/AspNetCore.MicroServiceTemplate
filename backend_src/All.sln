@@ -60,6 +60,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MST.Goods.Test", "MST.Goods
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MST.Infra.Rpc", "MST.Infra.Rpc\MST.Infra.Rpc.csproj", "{6A7A6E53-474E-478D-A2F4-7436D7C17714}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DockerComposeScripts", "DockerComposeScripts", "{7A3436E8-09BC-43C8-A2A5-7CBF6F8E7278}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

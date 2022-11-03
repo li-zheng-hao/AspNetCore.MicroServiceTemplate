@@ -17,6 +17,8 @@ using MST.Infra.Shared.Configuration;
 using MST.Infra.Shared.Contract.DTO;
 using MST.Infra.Shared.Filter;
 using MST.Infra.Shared.HttpHandler;
+using Nacos.AspNetCore.V2;
+using Nacos.V2.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Polly;
@@ -26,6 +28,7 @@ using Serilog.Exceptions;
 using Serilog.Formatting.Json;
 using Serilog.Sinks.Elasticsearch;
 using Serilog.Sinks.File;
+using SkyApm.Tracing;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace MST.Infra.Shared;
@@ -35,6 +38,27 @@ namespace MST.Infra.Shared;
 /// </summary>
 public static class ServiceDependencyInjection
 {
+   
+    #region Nacos
+
+    public static IServiceCollection AddNacosConfigurationCenter(this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddNacosV2Config(configuration, sectionName: "NacosConfig");
+        return services;
+    }
+
+    public static IServiceCollection AddNacosServiceDiscoveryCenter(this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddNacosAspNet(configuration, section: "Nacos");
+        return services;
+    }
+
+  
+
+    #endregion
+
     #region FreeSql
 
     /// <summary>
@@ -83,7 +107,6 @@ public static class ServiceDependencyInjection
     }
 
     #endregion
-
     #region DTM
 
     /// <summary>
@@ -132,13 +155,14 @@ public static class ServiceDependencyInjection
     #region refitclient 微服务间调用
 
     public static IServiceCollection AddCustomRefitClient<TRestClient>(this IServiceCollection collection,
-        List<IAsyncPolicy<HttpResponseMessage>> policies,string serviceName) where TRestClient : class
+        List<IAsyncPolicy<HttpResponseMessage>> policies, string serviceName) where TRestClient : class
     {
         collection.TryAddScoped<TokenDelegatingHandler>();
         collection.TryAddScoped<NacosDiscoverDelegatingHandler>();
         var refitSettings = new RefitSettings();
         refitSettings.ContentSerializer = new NewtonsoftJsonContentSerializer();
-        var clientBuilder = collection.AddRefitClient<TRestClient>(refitSettings).SetHandlerLifetime(TimeSpan.FromMinutes(2))
+        var clientBuilder = collection.AddRefitClient<TRestClient>(refitSettings)
+            .SetHandlerLifetime(TimeSpan.FromMinutes(2))
             .AddPolicyHandlerICollection(policies)
             // 配置Token
             .AddHttpMessageHandler<TokenDelegatingHandler>()
@@ -153,56 +177,58 @@ public static class ServiceDependencyInjection
     #region 日志配置
 
     public static IServiceCollection AddCustomSerilog(this IServiceCollection collection, IHostBuilder hostBuilder,
-        IConfiguration configuration, IWebHostEnvironment environment)
+        IConfiguration envConfiguration, IWebHostEnvironment environment)
     {
-        var section = configuration.GetSection("ElasticSearch");
+        var section = envConfiguration.GetSection("ElasticSearch");
+        var commonOptions = envConfiguration.GetSection("Common").Get<CommonOptions>();
+
         if (section is null)
         {
             throw new Exception("Elasticsearch配置不存在!");
         }
 
-        var elasticSearchOptions = section.Get<ElasticSearchOptions>();
-        var commonOptions = section.Get<CommonOptions>();
-        const string OUTPUT_TEMPLATE =
-            "[{Level}] {ENV} {Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} {Message:lj}{NewLine}{Exception}";
-        var config = new LoggerConfiguration()
+        hostBuilder.UseSerilog((context, services, configuration) =>
+        {
+            var elasticSearchOptions = section.Get<ElasticSearchOptions>();
+            const string OUTPUT_TEMPLATE =
+                "[{Level}] [{TraceId}] {ENV} {Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} {Message:lj}{NewLine}{Exception}";
+            configuration
 #if DEBUG
-            .MinimumLevel.Debug()
+                .MinimumLevel.Debug()
 #else
             .MinimumLevel.Information()
 #endif
-            .Enrich.WithProperty("ENV", environment.EnvironmentName)
-            .Enrich.WithMachineName()
-            .Enrich.FromLogContext()
-            .Enrich.WithExceptionDetails()
-            .WriteTo.Console(outputTemplate: OUTPUT_TEMPLATE)
-            .WriteTo.File("logs/applog_.log"
-                , rollingInterval: RollingInterval.Day
-                , outputTemplate: OUTPUT_TEMPLATE);
-        // 如果有elasticsearch则写入
-        if (elasticSearchOptions?.Url?.IsNotNullOrWhiteSpace()==true)
-            config.WriteTo.Elasticsearch(
-                new ElasticsearchSinkOptions(
-                        new Uri(configuration["ElasticSearchUrl"])) // for the docker-compose implementation
-                    {
-                        AutoRegisterTemplate = true,
-                        // OverwriteTemplate = true,
-                        DetectElasticsearchVersion = true,
-                        AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
-                        // NumberOfReplicas = 1,
-                        // NumberOfShards = 2,
-                        // BufferBaseFilename = "logs/buffer",
-                        // RegisterTemplateFailure = RegisterTemplateRecovery.FailSink,
-                        // FailureCallback = e => Console.WriteLine("Unable to submit event " + e.MessageTemplate),
-                        // EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog |
-                        // EmitEventFailureHandling.WriteToFailureSink |
-                        // EmitEventFailureHandling.RaiseCallback,
-                        // FailureSink = new FileSink("logs/fail-{Date}.txt", new JsonFormatter(), null, null)
-                    });
-
-        var logger = config.CreateLogger();
-        Log.Logger = logger;
-        hostBuilder.UseSerilog(logger);
+                .Enrich.WithProperty("ENV", environment.EnvironmentName)
+                .Enrich.WithMachineName()
+                .Enrich.FromLogContext()
+                .Enrich.WithExceptionDetails()
+                .WriteTo.Console(outputTemplate: OUTPUT_TEMPLATE)
+                .WriteTo.Skywalking(services)
+                .WriteTo.File("logs/applog_.log"
+                    , rollingInterval: RollingInterval.Day
+                    , outputTemplate: OUTPUT_TEMPLATE);
+            // 如果有elasticsearch则写入
+            if (elasticSearchOptions?.Url?.IsNotNullOrWhiteSpace() == true)
+                configuration.WriteTo.Elasticsearch(
+                    new ElasticsearchSinkOptions(
+                            new Uri(elasticSearchOptions.Url)) // for the docker-compose implementation
+                        {
+                            AutoRegisterTemplate = true,
+                            // OverwriteTemplate = true,
+                            DetectElasticsearchVersion = true,
+                            AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
+                            // NumberOfReplicas = 1,
+                            // NumberOfShards = 2,
+                            // BufferBaseFilename = "logs/buffer",
+                            // RegisterTemplateFailure = RegisterTemplateRecovery.FailSink,
+                            // FailureCallback = e => Console.WriteLine("Unable to submit event " + e.MessageTemplate),
+                            // EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog |
+                            // EmitEventFailureHandling.WriteToFailureSink |
+                            // EmitEventFailureHandling.RaiseCallback,
+                            // FailureSink = new FileSink("logs/fail-{Date}.txt", new JsonFormatter(), null, null)
+                        });
+        
+        });
         return collection;
     }
 
@@ -375,6 +401,21 @@ public static class ServiceDependencyInjection
             c.DocumentFilter<SwaggerIgnoreFilter>();
         });
         return serviceCollection;
+    }
+
+    #endregion
+
+    #region 过滤器
+
+    public static IMvcBuilder AddCustomMvc(this IServiceCollection collection)
+    {
+        return collection.AddMvc(options =>
+        {
+            // 自定义模型验证
+            // options.Filters.Add<ModelValidatorFilter>();
+            //异常处理
+            options.Filters.Add<GlobalExceptionsFilter>();
+        });
     }
 
     #endregion

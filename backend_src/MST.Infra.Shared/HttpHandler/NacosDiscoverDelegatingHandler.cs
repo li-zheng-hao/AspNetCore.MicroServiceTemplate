@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Nacos.V2;
 
 namespace MST.Infra.Shared.HttpHandler
 {
@@ -6,10 +7,12 @@ namespace MST.Infra.Shared.HttpHandler
     {
         // private readonly ConsulClient _consulClient;
         private readonly ILogger<NacosDiscoverDelegatingHandler> _logger;
+        private readonly INacosNamingService _svc;
 
-        public NacosDiscoverDelegatingHandler( ILogger<NacosDiscoverDelegatingHandler> logger)
+        public NacosDiscoverDelegatingHandler( ILogger<NacosDiscoverDelegatingHandler> logger,Nacos.V2.INacosNamingService svc)
         {
             _logger = logger;
+            _svc = svc;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -17,27 +20,21 @@ namespace MST.Infra.Shared.HttpHandler
             var currentUri = request.RequestUri;
             if (currentUri is null)
                 throw new NullReferenceException(nameof(request.RequestUri));
+            var baseUri = currentUri.Host;
             // TODO 这里配置注册发现
-            var realRequestUri = new Uri($"{currentUri.Scheme}://localhost:5000{currentUri.PathAndQuery}");
-            request.RequestUri = realRequestUri;
-            _logger.LogDebug($"RequestUri:{request.RequestUri}");
-            // var discoverProvider = new DiscoverProviderBuilder(_consulClient)
-            //                                                 .WithCacheSeconds(5)
-            //                                                 .WithServiceName(currentUri.Host)
-            //                                                 .WithLoadBalancer(TypeLoadBalancer.RandomLoad)
-            //                                                 .WithLogger(_logger)
-            //                                                 .Build()
-            //                                                 ;
-            // var baseUri = await discoverProvider.GetSingleHealthServiceAsync();
-            // if (baseUri.IsNullOrWhiteSpace())
-                // throw new NullReferenceException($"{currentUri.Host} does not contain helath service address!");
-            // else
-            // {
-                // var realRequestUri = new Uri($"{currentUri.Scheme}://{baseUri}{currentUri.PathAndQuery}");
-                // request.RequestUri = realRequestUri;
-                // _logger.LogDebug($"RequestUri:{request.RequestUri}");
-            // }
-
+            _logger.LogDebug("请求地址 :{RequestRequestUri}", request.RequestUri);
+            var healthyInstance = await _svc.SelectOneHealthyInstance(currentUri.Host);
+            if (healthyInstance is null)
+            {
+                throw new NullReferenceException($"{currentUri.Host}服务没有健康的节点!");
+            }
+            else
+            {
+                var realRequestUri = new Uri($"{currentUri.Scheme}://{baseUri}{currentUri.PathAndQuery}");
+                request.RequestUri = realRequestUri;
+                _logger.LogDebug("请求真实地址:{RequestRequestUri}", request.RequestUri);
+            }
+                
             try
             {
                 return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);

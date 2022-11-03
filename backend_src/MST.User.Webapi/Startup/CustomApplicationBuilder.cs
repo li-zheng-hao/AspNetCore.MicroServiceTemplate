@@ -2,6 +2,8 @@
 using MST.Infra.Rpc.Rest;
 using MST.Infra.Shared;
 using Refit;
+using Serilog.Context;
+using SkyApm.Tracing;
 
 namespace MST.User.Webapi.Startup;
 
@@ -10,6 +12,8 @@ public static class CustomApplicationBuilder
     public static WebApplicationBuilder ConfigureCustomService(this WebApplicationBuilder builder)
     {
         builder.Services.AddCustomSerilog(builder.Host,builder.Configuration,builder.Environment);
+        builder.Services.AddNacosConfigurationCenter(builder.Configuration);
+        builder.Services.AddNacosServiceDiscoveryCenter(builder.Configuration);
         builder.Services.AddCustomCors();
         // builder.Services.AddCustomCAP(builder.Configuration);
         builder.Services.AddCustomSwaggerGen();
@@ -24,10 +28,21 @@ public static class CustomApplicationBuilder
             });
         return builder;
     }
-    public static IMvcBuilder ConfigureCustomMvcService(this IMvcBuilder builder)
+    public static IMvcBuilder ConfigureCustomMvcServices(this IMvcBuilder builder)
     {
         builder.AddCustomJson();
         // todo 取消null检查
         return builder;
+    }
+    public static WebApplication UseCustomMiddlewares(this WebApplication app)
+    {
+        // 输出到elasticsearch的日志加上skywalking的traceid，方便请求过滤
+        app.Use(async (context, next) =>
+        {
+            var accessors = context.RequestServices.GetService<IEntrySegmentContextAccessor>();
+            using var _=LogContext.PushProperty("TraceId", accessors?.Context.TraceId);
+            await next();
+        });
+        return app;
     }
 }

@@ -1,5 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MST.Infra.Rpc.Rest;
+using MST.Infra.Shared.Contract.HttpResponse;
+using MST.User.Contract;
+using SkyApm.Diagnostics.MSLogging;
+using SkyApm.Tracing;
+using SkyApm.Tracing.Segments;
+using ILogger = SkyApm.Logging.ILogger;
 
 namespace MST.User.Webapi.Controllers;
 
@@ -14,21 +21,41 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ILogger<WeatherForecastController> _logger;
     private readonly IAuthRestClient _authRestClient;
+    private readonly IEntrySegmentContextAccessor _segContext;
+    private readonly ITracingContext _tracingContext;
+    private readonly ILoggerFactory _skyapmlogger;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, IAuthRestClient authRestClient)
+    public WeatherForecastController(ILogger<WeatherForecastController> logger,ILoggerFactory skyapmlogger, IAuthRestClient authRestClient,ITracingContext tracingContext, IEntrySegmentContextAccessor  segContext)
     {
+        _skyapmlogger = skyapmlogger;
+        _tracingContext = tracingContext;
+        _segContext = segContext;
         _authRestClient = authRestClient;
         _logger = logger;
     }
-
+    /// <summary>
+    /// 随便测试
+    /// </summary>
+    /// <param name="msg"></param>
+    /// <returns></returns>
     [HttpGet]
-    public async Task<string> Get()
+    public string HelloWorld(string msg)
     {
-        // var client = _factory.CreateClient("MyClient");
-        // var res = await client.GetStringAsync("");
-        return "1";
+        //获取全局的skywalking的TracId
+        var TraceId = _segContext.Context.TraceId;
+        Console.WriteLine($"TraceId={TraceId}");
+        _logger.LogInformation("测试Serilog写入Skywalking");
+        var logger = _skyapmlogger.CreateLogger("logger");
+        var logger2 = _skyapmlogger.CreateLogger(typeof(SkyApmLogger));
+        logger.LogInformation("测试官方的Logger");
+        logger2.LogInformation("测试官方的Logger");
+        _segContext.Context.Span.AddLog(LogEvent.Message($"UserService调用---Worker running at: {DateTime.Now}"));
+        return msg;
     }
-
+    /// <summary>
+    /// 测试登录
+    /// </summary>
+    /// <returns></returns>
     [HttpPost]
     public async Task<string> TestLogin()
     {
@@ -45,5 +72,25 @@ public class WeatherForecastController : ControllerBase
         {
             return res.Content.ToJsonString();
         }
+    }
+
+    /// <summary>
+    /// 测试管理员角色校验
+    /// </summary>
+    /// <returns></returns>
+    [Authorize(Roles = "admin")]
+    [HttpPost]
+    public string TestAuth()
+    {
+        return "管理员验证成功";
+    }
+    /// <summary>
+    /// 测试管理员角色校验
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
+    public string TestModelValidation(TestDto dto)
+    {
+        return "DTO校验通过";
     }
 }

@@ -1,0 +1,123 @@
+version: "3" 
+services:
+  nacos:
+    image: nacos/nacos-server:2.0.2
+    container_name: nacos-standalone
+    environment:
+    - PREFER_HOST_MODE=hostname
+    - MODE=standalone
+    ports:
+    - "8848:8848"
+    - "9848:9848"
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    ports:
+      - 3306:3306
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: root
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+  apisix-dashboard:
+    container_name: apisix-dashboard
+    image: apache/apisix-dashboard:2.13-alpine
+    restart: always
+    volumes:
+    - ./dashboard_conf/conf.yaml:/usr/local/apisix-dashboard/conf/conf.yaml
+    ports:
+    - "9000:9000"
+  apisix:
+    image: apache/apisix:2.15.0-alpine
+    restart: always
+    container_name: apisix
+    volumes:
+      - ./apisix_log:/usr/local/apisix/logs
+      - ./apisix_conf/config.yaml:/usr/local/apisix/conf/config.yaml:ro
+    depends_on:
+      - etcd
+    # network_mode: host
+    ports:
+      - "9080:9080/tcp"
+      - "9091:9091/tcp"
+      - "9443:9443/tcp"
+      - "9092:9092/tcp"
+  etcd:
+    image: bitnami/etcd:3.4.15
+    restart: always
+    container_name: etcd
+    environment:
+      ETCD_ENABLE_V2: "true"
+      ALLOW_NONE_AUTHENTICATION: "yes"
+      ETCD_ADVERTISE_CLIENT_URLS: "http://0.0.0.0:2379"
+      ETCD_LISTEN_CLIENT_URLS: "http://0.0.0.0:2379"
+    ports:
+      - "2379:2379/tcp"
+  redis:
+    image: redis
+    restart: always
+    container_name: redis
+    privileged: true
+    ports:
+      - 6379:6379
+    environment:
+      TZ: Asia/Shanghai
+  elasticsearch:
+    image: elasticsearch:7.14.2
+    container_name: elasticsearch
+    restart: always
+    ports:
+      - 9200:9200
+    environment:
+      - "TAKE_FILE_OWNERSHIP=true" #volumes 挂载权限 如果不想要挂载es文件改配置可以删除
+      - "discovery.type=single-node" #单机模式启动
+      - "TZ=Asia/Shanghai" # 设置时区
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # 设置jvm内存大小
+    volumes:
+      - ./elasticsearch/logs:/usr/share/elasticsearch/logs
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+      - ./elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+  skywalking-oap-server:
+    image: apache/skywalking-oap-server:8.9.1
+    container_name: skywalking-oap-server
+    depends_on:
+      - elasticsearch
+    links:
+      - elasticsearch
+    restart: always
+    ports:
+      - 11800:11800
+      - 12800:12800
+    environment:
+      SW_STORAGE: elasticsearch  # 指定ES版本
+      SW_STORAGE_ES_CLUSTER_NODES: elasticsearch:9200
+      TZ: Asia/Shanghai
+  skywalking-ui:
+    image: apache/skywalking-ui:8.9.1
+    container_name: skywalking-ui
+    depends_on:
+      - skywalking-oap-server
+    links:
+      - skywalking-oap-server
+    restart: always
+    ports:
+      - 8080:8080
+    environment:
+      SW_OAP_ADDRESS: http://skywalking-oap-server:12800
+      TZ: Asia/Shanghai
+  rabbitmq:
+    image: rabbitmq:3.10-management
+    container_name: rabbitmq
+    ports:
+      - "15673:15672"
+      - "5673:5672"
+    restart: always
+    privileged: true
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8

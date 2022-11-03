@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MST.Order.Webapi.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("order/[controller]/[action]")]
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
@@ -18,8 +18,8 @@ public class WeatherForecastController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<WeatherForecast> Get()
+    [HttpGet]
+    public IEnumerable<WeatherForecast> HelloWord()
     {
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
