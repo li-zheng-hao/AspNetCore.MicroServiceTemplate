@@ -15,6 +15,8 @@
         <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
         <PackageReference Include="nacos-sdk-csharp.AspNetCore" Version="1.3.4" />
         <PackageReference Include="nacos-sdk-csharp.Extensions.Configuration" Version="1.3.4" />
+        <PackageReference Include="Quickwire" Version="1.3.2" />
+        <PackageReference Include="Rougamo.Fody" Version="1.2.0" />
         <PackageReference Include="Serilog.Sinks.Skywalking" Version="0.2.0" />
         <PackageReference Include="SkyAPM.Agent.AspNetCore" Version="2.1.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
@@ -28,6 +30,9 @@
       <ProjectReference Include="..\MST.Infra.Snowflake\MST.Infra.Snowflake.csproj" />
       <ProjectReference Include="..\MST.Infra.Utility\MST.Infra.Utility.csproj" />
       <ProjectReference Include="..\MST.User.Contract\MST.User.Contract.csproj" />
+      <ProjectReference Include="..\MST.User.Repository\MST.User.Repository.csproj" />
+      <ProjectReference Include="..\MST.User.Service\MST.User.Service.csproj" />
+      <ProjectReference Include="..\MST.User.Test\MST.User.Test.csproj" />
     </ItemGroup>
     <ItemGroup>
           <Content Update="skyapm.json">

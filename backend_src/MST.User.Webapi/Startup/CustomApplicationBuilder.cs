@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AspNetCore.StartUpTemplate.Core;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MST.Infra.Rpc.Rest;
 using MST.Infra.Shared;
+using MST.User.Repository.UserRepository;
+using MST.User.Service;
+using Quickwire;
 using Refit;
 using Serilog.Context;
 using SkyApm.Tracing;
@@ -15,7 +19,7 @@ public static class CustomApplicationBuilder
         builder.Services.AddNacosConfigurationCenter(builder.Configuration);
         builder.Services.AddNacosServiceDiscoveryCenter(builder.Configuration);
         builder.Services.AddCustomCors();
-        // builder.Services.AddCustomCAP(builder.Configuration);
+        builder.Services.AddCustomCAP(builder.Configuration);
         builder.Services.AddCustomSwaggerGen();
         var policies = PollyPolicyManager.GenerateDefaultPolicies(builder.Environment);
         builder.Services.AddCustomRefitClient<IAuthRestClient>(policies,ServiceConsts.AuthServiceName);
@@ -26,6 +30,10 @@ public static class CustomApplicationBuilder
                 option.ApiName = "UserApi"; // 和ids上配置的ApiResource要一样
                 option.RequireHttpsMetadata = false;
             });
+        builder.Services.AddFreeSql(builder.Configuration, typeof(UserRepository).Assembly);
+        builder.Services.ScanAssembly(typeof(UserService).Assembly,it=>true);
+        builder.Services.ScanAssembly(typeof(UserRepository).Assembly,it=>true);
+        builder.Services.AddFreeRepository(null, typeof(Program).Assembly);
         return builder;
     }
     public static IMvcBuilder ConfigureCustomMvcServices(this IMvcBuilder builder)
@@ -41,6 +49,11 @@ public static class CustomApplicationBuilder
         {
             var accessors = context.RequestServices.GetService<IEntrySegmentContextAccessor>();
             using var _=LogContext.PushProperty("TraceId", accessors?.Context.TraceId);
+            await next();
+        });
+        app.Use(async (context, next) =>
+        {
+            TransactionalAttribute.SetServiceProvider(context.RequestServices);
             await next();
         });
         return app;

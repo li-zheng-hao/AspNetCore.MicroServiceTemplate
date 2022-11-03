@@ -6,4 +6,13 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\MST.User.Contract\MST.User.Contract.csproj" />
+      <ProjectReference Include="..\MST.User.Model\MST.User.Model.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Quickwire" Version="1.3.2" />
+    </ItemGroup>
+
 </Project>

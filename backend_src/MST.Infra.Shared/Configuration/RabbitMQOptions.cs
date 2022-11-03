@@ -1,5 +1,7 @@
-﻿namespace MST.Infra.Shared.Configuration;
+﻿using System.ComponentModel;
 
+namespace MST.Infra.Shared.Configuration;
+[Description("RabbitMQ")]
 public class RabbitMQOptions
 {
     public string Host { get; set; }

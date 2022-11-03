@@ -6,4 +6,12 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="FreeSql.DbContext" Version="3.2.682" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MST.User.Model\MST.User.Model.csproj" />
+    </ItemGroup>
+
 </Project>

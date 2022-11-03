@@ -1,8 +1,11 @@
-﻿namespace MST.Infra.Shared.Configuration;
+﻿using System.ComponentModel;
+
+namespace MST.Infra.Shared.Configuration;
 
 /// <summary>
 /// 一些未分类的通用配置
 /// </summary>
+[Description("Common")]
 public class CommonOptions
 {
     /// <summary>

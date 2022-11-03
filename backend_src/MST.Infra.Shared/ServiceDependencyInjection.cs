@@ -101,8 +101,8 @@ public static class ServiceDependencyInjection
 
         services.AddSingleton(fsql);
         services.AddScoped<UnitOfWorkManager>();
-        services.AddFreeRepository(null, repoAssembly);
-
+        services.AddFreeRepository(null,repoAssembly);
+        services.AddFreeRepository(null, Assembly.GetEntryAssembly());
         return services;
     }
 
@@ -179,8 +179,10 @@ public static class ServiceDependencyInjection
     public static IServiceCollection AddCustomSerilog(this IServiceCollection collection, IHostBuilder hostBuilder,
         IConfiguration envConfiguration, IWebHostEnvironment environment)
     {
-        var section = envConfiguration.GetSection("ElasticSearch");
-        var commonOptions = envConfiguration.GetSection("Common").Get<CommonOptions>();
+        var section = envConfiguration.GetSection(typeof(ElasticSearchOptions).GetDescription());
+        var elasticSearchOptions = section.Get<ElasticSearchOptions>();
+
+        var commonOptions = envConfiguration.GetSection(typeof(CommonOptions).GetDescription()).Get<CommonOptions>();
 
         if (section is null)
         {
@@ -189,7 +191,6 @@ public static class ServiceDependencyInjection
 
         hostBuilder.UseSerilog((context, services, configuration) =>
         {
-            var elasticSearchOptions = section.Get<ElasticSearchOptions>();
             const string OUTPUT_TEMPLATE =
                 "[{Level}] [{TraceId}] {ENV} {Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} {Message:lj}{NewLine}{Exception}";
             configuration
@@ -238,9 +239,9 @@ public static class ServiceDependencyInjection
 
     public static IServiceCollection AddCustomCAP(this IServiceCollection collection, IConfiguration configuration)
     {
-        var mysqlOptions = configuration.GetSection("Mysql").Get<MysqlOptions>();
-        var capOptions = configuration.GetSection("Cap").Get<CapOptions>();
-        var rabbitMQOptions = configuration.GetSection("RabbitMQ").Get<RabbitMQOptions>();
+        var mysqlOptions = configuration.GetSection(typeof(MysqlOptions).GetDescription()).Get<MysqlOptions>();
+        var capOptions = configuration.GetSection(typeof(CapOptions).GetDescription()).Get<CapOptions>();
+        var rabbitMQOptions = configuration.GetSection(typeof(RabbitMQOptions).GetDescription()).Get<RabbitMQOptions>();
         collection.AddCap(x =>
         {
             x.UseDashboard();
@@ -272,7 +273,7 @@ public static class ServiceDependencyInjection
     public static IServiceCollection AddFreeRedis(this IServiceCollection serviceCollection,
         IConfiguration configuration)
     {
-        var redisOptions = configuration.GetSection("Redis").Get<RedisOptions>();
+        var redisOptions = configuration.GetSection(typeof(RedisOptions).GetDescription()).Get<RedisOptions>();
         // 单机
         RedisClient redisClient = new RedisClient(
             redisOptions.ConnectionString

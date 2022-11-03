@@ -6,4 +6,14 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\MST.Infra.Shared\MST.Infra.Shared.csproj" />
+      <ProjectReference Include="..\MST.User.Contract\MST.User.Contract.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Quickwire" Version="1.3.2" />
+      <PackageReference Include="Rougamo.Fody" Version="1.2.0" />
+    </ItemGroup>
+
 </Project>

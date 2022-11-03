@@ -11,7 +11,7 @@ public sealed class ServiceLocator
     }
 
     /// <summary>
-    /// 只能获取Singleton/Transient，获取Scoped周期的对象会存与构造函数获取的不是相同对象
+    /// 根级别的ServiceProvider,scope和transient级别需要创建scope,否则不会自动回收
     /// </summary>
     public static IServiceProvider? Provider { get; set; }
 }

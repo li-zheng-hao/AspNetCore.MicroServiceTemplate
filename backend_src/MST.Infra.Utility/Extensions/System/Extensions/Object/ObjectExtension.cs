@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.ComponentModel;
+using System.Reflection;
+using Newtonsoft.Json;
 
 namespace System;
 
@@ -14,8 +16,9 @@ public static class ObjectExtension
         if (source is null)
             return string.Empty;
 
-        return source.ToString()??string.Empty;
+        return source.ToString() ?? string.Empty;
     }
+
     /// <summary>
     /// 转换成json字符串
     /// </summary>
@@ -28,5 +31,16 @@ public static class ObjectExtension
         if (source is string s)
             return s;
         return JsonConvert.SerializeObject(source);
+    }
+
+    /// <summary>
+    /// An object extension method that gets description attribute.
+    /// </summary>
+    /// <param name="value">The value to act on.</param>
+    /// <returns>The description attribute.</returns>
+    public static string? GetDescription(this Type value)
+    {
+        var attr = value?.GetCustomAttribute<DescriptionAttribute>();
+        return attr?.Description;
     }
 }
