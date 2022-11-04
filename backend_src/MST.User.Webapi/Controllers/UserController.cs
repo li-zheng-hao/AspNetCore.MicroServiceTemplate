@@ -1,11 +1,11 @@
 ﻿using FreeSql;
 using Microsoft.AspNetCore.Mvc;
 using MST.Infra.Configuration;
+using MST.Infra.Model;
 using MST.Infra.Shared.Contract.HttpResponse;
 using MST.User.Contract;
 using MST.User.Contract.IRepository;
 using MST.User.Contract.IService;
-using MST.User.Model;
 
 namespace MST.User.Webapi.Controllers;
 
@@ -36,10 +36,22 @@ public class UserController:ControllerBase
     /// 随机新增一个用户
     /// </summary>
     /// <returns></returns>
-    [HttpGet]
+    [HttpPost]
     public async Task<ResponseResult> AddRandomUser()
     {
         Users user=await _userService.AddRandomUserAsync();
+        return ResponseResult.Success(user);
+    }
+    /// <summary>
+    /// 新增指定账号密码的用户
+    /// </summary>
+    /// <param name="username"></param>
+    /// <param name="password"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ResponseResult> AddUser(string username,string password)
+    {
+        Users user=await _userService.AddUser(username,password);
         return ResponseResult.Success(user);
     }
     /// <summary>

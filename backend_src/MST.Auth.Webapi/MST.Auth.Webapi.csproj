@@ -8,8 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="FreeSql" Version="3.2.682" />
         <PackageReference Include="IdentityServer4" Version="4.1.2" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MST.Infra.Model\MST.Infra.Model.csproj" />
+      <ProjectReference Include="..\MST.Infra.Shared\MST.Infra.Shared.csproj" />
     </ItemGroup>
 
 </Project>

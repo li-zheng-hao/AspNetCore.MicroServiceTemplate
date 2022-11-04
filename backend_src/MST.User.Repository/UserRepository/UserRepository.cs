@@ -1,8 +1,8 @@
 ﻿using FreeSql;
 using Microsoft.Extensions.DependencyInjection;
+using MST.Infra.Model;
 using MST.User.Contract;
 using MST.User.Contract.IRepository;
-using MST.User.Model;
 using Quickwire.Attributes;
 
 namespace MST.User.Repository.UserRepository

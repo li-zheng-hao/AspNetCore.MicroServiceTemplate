@@ -61,7 +61,7 @@ public static class ServiceDependencyInjection
     /// <param name="services"></param>
     /// <param name="c"></param>
     public static IServiceCollection AddFreeSql(this IServiceCollection services, IConfiguration configuration,
-        Assembly repoAssembly)
+        Assembly? repoAssembly)
     {
         var mysqlOptions = configuration.GetSection("Mysql").Get<MysqlOptions>();
         Func<IServiceProvider, IFreeSql> fsql = r =>
@@ -95,8 +95,8 @@ public static class ServiceDependencyInjection
 
         services.AddSingleton(fsql);
         services.AddScoped<UnitOfWorkManager>();
-        services.AddFreeRepository(null,repoAssembly);
-        services.AddFreeRepository(null, Assembly.GetEntryAssembly());
+        if(repoAssembly is not null)
+            services.AddFreeRepository(null,repoAssembly);
         return services;
     }
 
@@ -162,7 +162,7 @@ public static class ServiceDependencyInjection
             .AddHttpMessageHandler<TokenDelegatingHandler>()
             // 配置Handler
             .AddHttpMessageHandler<NacosDiscoverDelegatingHandler>();
-        clientBuilder.ConfigureHttpClient(client => client.BaseAddress = new Uri("http://service-name"));
+        clientBuilder.ConfigureHttpClient(client => client.BaseAddress = new Uri($"http://{serviceName}"));
         return collection;
     }
 

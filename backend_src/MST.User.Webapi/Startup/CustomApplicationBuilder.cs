@@ -35,6 +35,7 @@ public static class CustomApplicationBuilder
         builder.Services.ScanAssembly(typeof(UserService).Assembly,it=>true);
         builder.Services.ScanAssembly(typeof(UserRepository).Assembly,it=>true);
         builder.Services.ScanAssembly(typeof(CommonOptions).Assembly,it=>true);
+        builder.Services.ScanAssembly(typeof(Program).Assembly,it=>true);
         builder.Services.AddFreeRepository(null, typeof(Program).Assembly);
         return builder;
     }

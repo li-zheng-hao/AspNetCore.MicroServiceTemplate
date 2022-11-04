@@ -1,5 +1,5 @@
 ﻿using FreeSql;
-using MST.User.Model;
+using MST.Infra.Model;
 
 namespace MST.User.Contract.IRepository;
 

@@ -64,6 +64,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DockerComposeScripts", "Doc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MST.Infra.Configuration", "MST.Infra.Configuration\MST.Infra.Configuration.csproj", "{9FF07189-17AF-42F1-928B-637891EF9BDB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MST.Infra.Model", "MST.Infra.Model\MST.Infra.Model.csproj", "{D5FAE4B3-C477-40EF-8B20-176772A2D728}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -96,6 +98,7 @@ Global
 		{BD46A057-E839-41CE-9E5A-B85EE5B4C12E} = {678DC020-BEA1-4EB1-81FD-51F5C2BE6B41}
 		{6A7A6E53-474E-478D-A2F4-7436D7C17714} = {E0945075-E4E5-4E38-8EBB-03CA8CF079A5}
 		{9FF07189-17AF-42F1-928B-637891EF9BDB} = {E0945075-E4E5-4E38-8EBB-03CA8CF079A5}
+		{D5FAE4B3-C477-40EF-8B20-176772A2D728} = {E0945075-E4E5-4E38-8EBB-03CA8CF079A5}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9AE4E74C-0366-43D5-AA5D-6FBE96E862A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -202,5 +205,9 @@ Global
 		{9FF07189-17AF-42F1-928B-637891EF9BDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FF07189-17AF-42F1-928B-637891EF9BDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FF07189-17AF-42F1-928B-637891EF9BDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5FAE4B3-C477-40EF-8B20-176772A2D728}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5FAE4B3-C477-40EF-8B20-176772A2D728}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5FAE4B3-C477-40EF-8B20-176772A2D728}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5FAE4B3-C477-40EF-8B20-176772A2D728}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

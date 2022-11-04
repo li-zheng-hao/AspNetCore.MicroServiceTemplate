@@ -11,6 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\MST.Infra.Model\MST.Infra.Model.csproj" />
       <ProjectReference Include="..\MST.User.Model\MST.User.Model.csproj" />
     </ItemGroup>
 

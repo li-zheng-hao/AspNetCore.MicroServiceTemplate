@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
 using MST.Auth.Webapi;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+builder.ConfigureCustomService();
+
 builder.Services.AddSwaggerGen();
 builder.Services.AddIdentityServer()
     .AddDeveloperSigningCredential() //临时生成的加密证书 即公钥私钥 也可以自己弄一个然后指定路径
@@ -24,11 +29,21 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
+// url重写 
+app.Use(async (httpContext, next) =>
+{
+    if (httpContext.Request.Path.Value!.Contains("/auth"))
+    {
+        httpContext.Request.Path = httpContext.Request.Path.Value.Replace("/auth", "");
+    }
+    await next();
+});
 app.UseIdentityServer();
 app.UseAuthorization();
-
-app.MapControllers();
+app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.Run();

@@ -23,13 +23,14 @@ namespace MST.Infra.Shared.HttpHandler
             var baseUri = currentUri.Host;
             // TODO 这里配置注册发现
             _logger.LogDebug("请求地址 :{RequestRequestUri}", request.RequestUri);
-            var healthyInstance = await _svc.SelectOneHealthyInstance(currentUri.Host);
+            var healthyInstance = await _svc.SelectOneHealthyInstance(currentUri.Host,ServiceConsts.ServiceGroupName);
             if (healthyInstance is null)
             {
                 throw new NullReferenceException($"{currentUri.Host}服务没有健康的节点!");
             }
             else
             {
+                baseUri = string.Format("{0}:{1}",healthyInstance.Ip,healthyInstance.Port);
                 var realRequestUri = new Uri($"{currentUri.Scheme}://{baseUri}{currentUri.PathAndQuery}");
                 request.RequestUri = realRequestUri;
                 _logger.LogDebug("请求真实地址:{RequestRequestUri}", request.RequestUri);

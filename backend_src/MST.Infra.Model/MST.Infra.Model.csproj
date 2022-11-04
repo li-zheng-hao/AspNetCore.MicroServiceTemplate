@@ -7,11 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MST.Infra.Shared\MST.Infra.Shared.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="GRpc" />
+      <PackageReference Include="FreeSql" Version="3.2.682" />
     </ItemGroup>
 
 </Project>

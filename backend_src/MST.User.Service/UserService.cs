@@ -1,11 +1,12 @@
 ﻿using AspNetCore.StartUpTemplate.Core;
 using FreeSql;
+using IdentityModel;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MST.Infra.Model;
 using MST.User.Contract;
 using MST.User.Contract.IRepository;
 using MST.User.Contract.IService;
-using MST.User.Model;
 using Quickwire.Attributes;
 
 namespace MST.User.Service;
@@ -34,6 +35,14 @@ public class UserService:IUserService
         await InternalUpdateAsync();
         throw new Exception("测试抛出异常后是否会回滚");
     }
+
+    public Task<Users> AddUser(string username, string password)
+    {
+        var user = new Users()
+            { Age = 1, Email = "1233123@qq.com", Role="admin",Password = password.ToSha256(), Sex = "男", UserName = username};
+        return _userRepository.InsertAsync(user);
+    }
+
     [Transactional]
     private async Task<bool> InternalUpdateAsync()
     {
