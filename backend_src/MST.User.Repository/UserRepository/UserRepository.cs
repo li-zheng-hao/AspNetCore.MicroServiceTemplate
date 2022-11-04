@@ -1,4 +1,5 @@
-﻿using MST.User.Contract;
+﻿using FreeSql;
+using MST.User.Contract;
 using MST.User.Contract.IRepository;
 using MST.User.Model;
 using Quickwire.Attributes;
@@ -9,10 +10,10 @@ namespace MST.User.Repository.UserRepository
     /// 仓储模式
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    // [RegisterService(ServiceType = typeof(IUserRepository))]
-    public class UserRepository : CurBaseRepository<Users,long>, IUserRepository
+    [RegisterService(ServiceType = typeof(IUserRepository))]
+    public class UserRepository : DefaultRepository<Users,long>, IUserRepository
     {
-        public UserRepository(IFreeSql fsql) : base(fsql)
+        public UserRepository(UnitOfWorkManager uowm) : base(uowm?.Orm,uowm)
         {
         }
     }

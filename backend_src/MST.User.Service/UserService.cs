@@ -13,9 +13,9 @@ namespace MST.User.Service;
 [RegisterService(ServiceType = typeof(IUserService))]
 public class UserService:IUserService
 {
-    private readonly IBaseRepository<Users> _userRepository;
+    private readonly IUserRepository _userRepository;
     public ILogger<UserService> _logger { get; init; }
-    public UserService(IBaseRepository<Users> userRepository)
+    public UserService(IUserRepository userRepository)
     {
         _userRepository = userRepository;
     }
