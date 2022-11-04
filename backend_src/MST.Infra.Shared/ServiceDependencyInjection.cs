@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using AspNetCore.StartUpTemplate.Filter;
-using DotNetCore.CAP.Messages;
 using FreeRedis;
 using FreeSql;
 using FreeSql.Internal;
@@ -11,9 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using MST.Infra.Shared.Configuration;
+using MST.Infra.Configuration;
 using MST.Infra.Shared.Contract.DTO;
 using MST.Infra.Shared.Filter;
 using MST.Infra.Shared.HttpHandler;
@@ -25,11 +23,7 @@ using Polly;
 using Refit;
 using Serilog;
 using Serilog.Exceptions;
-using Serilog.Formatting.Json;
 using Serilog.Sinks.Elasticsearch;
-using Serilog.Sinks.File;
-using SkyApm.Tracing;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace MST.Infra.Shared;
 

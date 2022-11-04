@@ -1,5 +1,6 @@
 ﻿using AspNetCore.StartUpTemplate.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using MST.Infra.Configuration;
 using MST.Infra.Rpc.Rest;
 using MST.Infra.Shared;
 using MST.User.Repository.UserRepository;
@@ -33,6 +34,7 @@ public static class CustomApplicationBuilder
         builder.Services.AddFreeSql(builder.Configuration, typeof(UserRepository).Assembly);
         builder.Services.ScanAssembly(typeof(UserService).Assembly,it=>true);
         builder.Services.ScanAssembly(typeof(UserRepository).Assembly,it=>true);
+        builder.Services.ScanAssembly(typeof(CommonOptions).Assembly,it=>true);
         builder.Services.AddFreeRepository(null, typeof(Program).Assembly);
         return builder;
     }

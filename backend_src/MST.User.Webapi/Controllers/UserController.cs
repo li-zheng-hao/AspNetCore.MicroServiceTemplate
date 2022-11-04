@@ -1,5 +1,6 @@
 ﻿using FreeSql;
 using Microsoft.AspNetCore.Mvc;
+using MST.Infra.Configuration;
 using MST.Infra.Shared.Contract.HttpResponse;
 using MST.User.Contract;
 using MST.User.Contract.IRepository;

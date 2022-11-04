@@ -47,6 +47,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\MST.Infra.Configuration\MST.Infra.Configuration.csproj" />
       <ProjectReference Include="..\MST.Infra.Utility\MST.Infra.Utility.csproj" />
     </ItemGroup>
 

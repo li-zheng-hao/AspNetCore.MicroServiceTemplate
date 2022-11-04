@@ -1,4 +1,5 @@
 ﻿using FreeSql;
+using Microsoft.Extensions.DependencyInjection;
 using MST.User.Contract;
 using MST.User.Contract.IRepository;
 using MST.User.Model;
@@ -10,7 +11,7 @@ namespace MST.User.Repository.UserRepository
     /// 仓储模式
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    [RegisterService(ServiceType = typeof(IUserRepository))]
+    [RegisterService(ServiceLifetime.Scoped,ServiceType = typeof(IUserRepository))]
     public class UserRepository : DefaultRepository<Users,long>, IUserRepository
     {
         public UserRepository(UnitOfWorkManager uowm) : base(uowm?.Orm,uowm)

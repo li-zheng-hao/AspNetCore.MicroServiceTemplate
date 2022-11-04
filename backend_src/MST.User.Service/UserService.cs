@@ -1,5 +1,6 @@
 ﻿using AspNetCore.StartUpTemplate.Core;
 using FreeSql;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MST.User.Contract;
 using MST.User.Contract.IRepository;
@@ -10,7 +11,7 @@ using Quickwire.Attributes;
 namespace MST.User.Service;
 
 [InjectAllInitOnlyProperties]
-[RegisterService(ServiceType = typeof(IUserService))]
+[RegisterService(ServiceLifetime.Scoped,ServiceType = typeof(IUserService))]
 public class UserService:IUserService
 {
     private readonly IUserRepository _userRepository;
