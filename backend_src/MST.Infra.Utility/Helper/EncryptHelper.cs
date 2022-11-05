@@ -23,7 +23,41 @@ public class EncryptHelper
         string hash = sBuilder.ToString();
         return hash.ToUpper();
     }
+    /// <summary>
+    /// 通过创建哈希字符串适用于任何 MD5 哈希函数 （在任何平台） 上创建 32 个字符的十六进制格式哈希字符串
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string Encrypt(Stream source)
+    {
+        using MD5 md5Hash = MD5.Create();
+        byte[] data = md5Hash.ComputeHash(source);
+        StringBuilder sBuilder = new StringBuilder();
+        foreach (byte t in data)
+        {
+            sBuilder.Append(t.ToString("x2"));
+        }
 
+        string hash = sBuilder.ToString();
+        return hash.ToUpper();
+    }
+    /// <summary>
+    /// 通过创建哈希字符串适用于任何 MD5 哈希函数 （在任何平台） 上创建 32 个字符的十六进制格式哈希字符串
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string Encrypt(byte[] source)
+    {
+        using MD5 md5Hash = MD5.Create();
+        byte[] data = md5Hash.ComputeHash(source);
+        StringBuilder sBuilder = new StringBuilder();
+        foreach (byte t in data)
+        {
+            sBuilder.Append(t.ToString("x2"));
+        }
+        string hash = sBuilder.ToString();
+        return hash.ToUpper();
+    }
     /// <summary>
     /// 验证source加密码后是否生成mdPwd
     /// </summary>

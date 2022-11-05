@@ -6,11 +6,6 @@
     public class FilesStorageOptions
     {
         /// <summary>
-        ///     存储方式（'LocalStorage','AliYunOSS','QCloudOSS'）
-        /// </summary>
-        public string StorageType { get; set; } = "LocalStorage";
-
-        /// <summary>
         ///     存储目录
         /// </summary>
         public string Path { get; set; } = "Upload";
@@ -30,10 +25,6 @@
         /// </summary>
         public string TencentBucketName { get; set; }
 
-        /// <summary>
-        ///     存储桶名称（七牛云）
-        /// </summary>
-        public string QiNiuBucketName { get; set; }
 
         /// <summary>
         ///     授权账户
@@ -69,5 +60,10 @@
         ///     最大允许上传单个文件大小（M）
         /// </summary>
         public int MaxSize { get; set; } = 20;
+        
+        /// <summary>
+        /// 本地存储时服务对应的域名
+        /// </summary>
+        public string ApiDomain { get; set; }
     }
 }
