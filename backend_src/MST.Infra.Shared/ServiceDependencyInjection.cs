@@ -189,7 +189,7 @@ public static class ServiceDependencyInjection
                 "[{Level}] [{TraceId}] {ENV} {Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} {Message:lj}{NewLine}{Exception}";
             configuration
 #if DEBUG
-                .MinimumLevel.Debug()
+                .MinimumLevel.Information()
 #else
             .MinimumLevel.Information()
 #endif

@@ -1,5 +1,4 @@
-﻿using AspNetCore.StartUpTemplate.Core;
-using MST.Infra.Shared;
+﻿using MST.Infra.Shared;
 using Serilog.Context;
 using SkyApm.Tracing;
 

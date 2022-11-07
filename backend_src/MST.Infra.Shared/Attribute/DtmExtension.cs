@@ -1,5 +1,4 @@
-﻿using AspNetCore.StartUpTemplate.Core;
-using Dapper;
+﻿using Dapper;
 using DtmCommon;
 using Serilog;
 using System.Data;

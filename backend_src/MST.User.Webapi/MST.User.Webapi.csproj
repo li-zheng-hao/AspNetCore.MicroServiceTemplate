@@ -30,6 +30,7 @@
       <ProjectReference Include="..\MST.Infra.Rpc\MST.Infra.Rpc.csproj" />
       <ProjectReference Include="..\MST.Infra.Shared\MST.Infra.Shared.csproj" />
       <ProjectReference Include="..\MST.Infra.Snowflake\MST.Infra.Snowflake.csproj" />
+      <ProjectReference Include="..\MST.Infra.Task\MST.Infra.Task.csproj" />
       <ProjectReference Include="..\MST.Infra.Utility\MST.Infra.Utility.csproj" />
       <ProjectReference Include="..\MST.User.Contract\MST.User.Contract.csproj" />
       <ProjectReference Include="..\MST.User.Repository\MST.User.Repository.csproj" />

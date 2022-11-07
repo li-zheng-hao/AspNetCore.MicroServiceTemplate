@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.Filters;
-using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Controllers;
 
-namespace AspNetCore.StartUpTemplate.Utility;
+namespace MST.Infra.Utility.Extensions;
 
 
 public static class MarkerAttributeExtensions

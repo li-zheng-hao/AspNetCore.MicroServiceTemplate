@@ -1,9 +1,9 @@
-﻿using AspNetCore.StartUpTemplate.Core;
-using FreeSql;
+﻿using FreeSql;
 using IdentityModel;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MST.Infra.Model;
+using MST.Infra.Shared.Attribute;
 using MST.User.Contract;
 using MST.User.Contract.IRepository;
 using MST.User.Contract.IService;

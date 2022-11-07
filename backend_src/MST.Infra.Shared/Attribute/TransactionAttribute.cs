@@ -5,9 +5,8 @@ using FreeSql;
 using Microsoft.Extensions.DependencyInjection;
 using Rougamo.Context;
 using Serilog;
-using Serilog.Core;
 
-namespace AspNetCore.StartUpTemplate.Core;
+namespace MST.Infra.Shared.Attribute;
 
 
 [AttributeUsage(AttributeTargets.Method)]

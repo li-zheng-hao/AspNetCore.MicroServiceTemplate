@@ -1,8 +1,9 @@
-﻿using AspNetCore.StartUpTemplate.Core;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MST.Infra.Configuration;
 using MST.Infra.Rpc.Rest;
 using MST.Infra.Shared;
+using MST.Infra.Shared.Attribute;
+using MST.Infra.Task;
 using MST.User.Repository.UserRepository;
 using MST.User.Service;
 using Quickwire;
@@ -16,6 +17,7 @@ public static class CustomApplicationBuilder
 {
     public static WebApplicationBuilder ConfigureCustomService(this WebApplicationBuilder builder)
     {
+        builder.Services.AddScheduler();
         builder.Services.AddCustomSerilog(builder.Host,builder.Configuration,builder.Environment);
         builder.Services.AddNacosConfigurationCenter(builder.Configuration);
         builder.Services.AddNacosServiceDiscoveryCenter(builder.Configuration);
