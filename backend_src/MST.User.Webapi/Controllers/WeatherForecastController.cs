@@ -1,8 +1,11 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MST.Infra.Rpc.Rest;
 using MST.Infra.Shared.Contract.HttpResponse;
 using MST.User.Contract;
+using MST.User.Webapi.Validation;
+using Quickwire.Attributes;
 using SkyApm.Diagnostics.MSLogging;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
@@ -12,6 +15,8 @@ namespace MST.User.Webapi.Controllers;
 
 [ApiController]
 [Route("user/[controller]/[action]")]
+[RegisterService]
+[InjectAllInitOnlyProperties]
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
@@ -24,7 +29,7 @@ public class WeatherForecastController : ControllerBase
     private readonly IEntrySegmentContextAccessor _segContext;
     private readonly ITracingContext _tracingContext;
     private readonly ILoggerFactory _skyapmlogger;
-
+    public IValidator<Person> PersonValidator { get; init; }
     public WeatherForecastController(ILogger<WeatherForecastController> logger,ILoggerFactory skyapmlogger, IAuthRestClient authRestClient,ITracingContext tracingContext, IEntrySegmentContextAccessor  segContext)
     {
         _skyapmlogger = skyapmlogger;
@@ -92,5 +97,13 @@ public class WeatherForecastController : ControllerBase
     public string TestModelValidation(TestDto dto)
     {
         return "DTO校验通过";
+    }
+    [HttpPost]
+    public HttpResponseResult TestFluentValidation(Person p)
+    {
+        // var res=PersonValidator.Validate(p);
+        // if (!res.IsValid)
+            // return HttpResponseResult.Failure("参数错误",res.Errors);
+        return HttpResponseResult.Success("yes");
     }
 }

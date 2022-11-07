@@ -27,20 +27,20 @@ public class UserController:ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    public async Task<ResponseResult> GetRandomUser()
+    public async Task<HttpResponseResult> GetRandomUser()
     {
         UserDto user=await _userService.GetRandomUserAsync();
-        return ResponseResult.Success(user);
+        return HttpResponseResult.Success(user);
     }
     /// <summary>
     /// 随机新增一个用户
     /// </summary>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ResponseResult> AddRandomUser()
+    public async Task<HttpResponseResult> AddRandomUser()
     {
         Users user=await _userService.AddRandomUserAsync();
-        return ResponseResult.Success(user);
+        return HttpResponseResult.Success(user);
     }
     /// <summary>
     /// 新增指定账号密码的用户
@@ -49,19 +49,19 @@ public class UserController:ControllerBase
     /// <param name="password"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ResponseResult> AddUser(string username,string password)
+    public async Task<HttpResponseResult> AddUser(string username,string password)
     {
         Users user=await _userService.AddUser(username,password);
-        return ResponseResult.Success(user);
+        return HttpResponseResult.Success(user);
     }
     /// <summary>
     /// 测试事务更新用户信息
     /// </summary>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ResponseResult> TransactionQueryAndUpdateUser()
+    public async Task<HttpResponseResult> TransactionQueryAndUpdateUser()
     {
         bool res=await _userService.TransactionQueryAndUpdateUserAsync();
-        return res ? ResponseResult.Success("") : ResponseResult.Failure("");
+        return res ? HttpResponseResult.Success("") : HttpResponseResult.Failure("");
     }
 }

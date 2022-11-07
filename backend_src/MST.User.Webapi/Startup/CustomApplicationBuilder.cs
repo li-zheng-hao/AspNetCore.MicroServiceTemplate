@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MST.Infra.Configuration;
 using MST.Infra.Rpc.Rest;
 using MST.Infra.Shared;
 using MST.Infra.Shared.Attribute;
 using MST.Infra.Task;
+using MST.User.Core;
 using MST.User.Repository.UserRepository;
 using MST.User.Service;
 using Quickwire;
@@ -39,6 +42,10 @@ public static class CustomApplicationBuilder
         builder.Services.ScanAssembly(typeof(CommonOptions).Assembly,it=>true);
         builder.Services.ScanAssembly(typeof(Program).Assembly,it=>true);
         builder.Services.AddFreeRepository(null, typeof(Program).Assembly);
+        
+        builder.Services.AddFluentValidationAutoValidation();
+        builder.Services.AddValidatorsFromAssembly(typeof(Anchor).Assembly);
+        
         return builder;
     }
     public static IMvcBuilder ConfigureCustomMvcServices(this IMvcBuilder builder)

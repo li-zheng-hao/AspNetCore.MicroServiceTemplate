@@ -26,10 +26,10 @@ public class AuthController:ControllerBase
     /// <param name="dto"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ResponseResult> LoginTest(LoginRequestDto dto)
+    public async Task<HttpResponseResult> LoginTest(LoginRequestDto dto)
     {
         var res=await _authRestClient.LoginAsync(dto);
-        return ResponseResult.Success(res.Content);
+        return HttpResponseResult.Success(res.Content);
     }
     /// <summary>
     /// 刷新token
@@ -37,10 +37,10 @@ public class AuthController:ControllerBase
     /// <param name="dto"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ResponseResult> RefreshTokenTest(LoginRequestDto dto)
+    public async Task<HttpResponseResult> RefreshTokenTest(LoginRequestDto dto)
     {
         var res=await _authRestClient.LoginAsync(dto);
-        return ResponseResult.Success(res.Content);
+        return HttpResponseResult.Success(res.Content);
     }
     /// <summary>
     /// 刷新token
@@ -48,10 +48,10 @@ public class AuthController:ControllerBase
     /// <param name="dto"></param>
     /// <returns></returns>
     [HttpGet]
-    public async Task<ResponseResult> GetAllServiceInstances()
+    public async Task<HttpResponseResult> GetAllServiceInstances()
     {
         var instances1 = await _NacosNamingService.GetAllInstances("userservice","public");
         var instances2 = await _NacosNamingService.GetAllInstances("authservice","public");
-        return ResponseResult.Success(new {instances1,instances2});
+        return HttpResponseResult.Success(new {instances1,instances2});
     }
 }

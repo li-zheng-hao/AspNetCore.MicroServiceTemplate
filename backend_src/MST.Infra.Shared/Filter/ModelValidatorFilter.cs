@@ -20,11 +20,11 @@ public class ModelValidatorFilter : ResultFilterAttribute
         var modelState = actionContext.ModelState;
         if (!modelState.IsValid)
         {
-            var baseResult = new ResponseResult()
+            var baseResult = new HttpResponseResult()
             {
-                Status = false,
-                Code = ResponseCode.PARAM_ERROR,
-                Msg = "请提交必要的参数",
+                success = false,
+                code = ResponseCode.PARAM_ERROR,
+                msg = "请提交必要的参数",
             };
             List<string> errors = new List<string>();
             foreach (var key in modelState.Keys)
@@ -35,7 +35,7 @@ public class ModelValidatorFilter : ResultFilterAttribute
                     errors.Add( $"{key} -  { state.Errors.FirstOrDefault()?.ErrorMessage}");
                 }
             }
-            baseResult.Data = errors;
+            baseResult.data = errors;
             actionContext.Result = new ContentResult
             {
                 Content = JsonConvert.SerializeObject(baseResult),

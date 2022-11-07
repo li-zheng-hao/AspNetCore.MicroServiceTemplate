@@ -1,3 +1,5 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using MST.Infra.Shared;
 using MST.User.Webapi;
 using MST.User.Webapi.Startup;
@@ -8,6 +10,7 @@ using SkyApm.Tracing;
 using SkyApm.Utilities.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
+
 // Add services to the container.
 builder.ConfigureCustomService();
 builder.Services.AddControllers().AddControllersAsServices().ConfigureCustomMvcServices();
@@ -15,6 +18,7 @@ builder.Services.AddControllers().AddControllersAsServices().ConfigureCustomMvcS
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCustomMvc();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

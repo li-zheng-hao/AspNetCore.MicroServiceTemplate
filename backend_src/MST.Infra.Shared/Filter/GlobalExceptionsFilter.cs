@@ -23,12 +23,12 @@ public class GlobalExceptionsFilter : IExceptionFilter
         HttpStatusCode status = HttpStatusCode.InternalServerError;
 
         //处理各种异常
-        var jm = new ResponseResult
+        var jm = new HttpResponseResult
         {
-            Status = false,
-            Code = (int)status,
-            Msg = "系统返回异常，请联系管理员进行处理！",
-            Data = context.Exception
+            success = false,
+            code = (int)status,
+            msg = "系统返回异常，请联系管理员进行处理！",
+            data = context.Exception
         };
         context.ExceptionHandled = true;
         context.Result = new JsonResult(jm);
