@@ -1,5 +1,6 @@
 ﻿using FreeRedis;
 using Microsoft.Extensions.DependencyInjection;
+using MST.Infra.CacheProvider.Configuration;
 using MST.Infra.CacheProvider.KeyGenerator;
 using Newtonsoft.Json;
 using Rougamo;
@@ -10,36 +11,44 @@ namespace MST.Infra.CacheProvider.Interceptor;
 [AttributeUsage(AttributeTargets.Method,AllowMultiple = false,Inherited = false)]
 public class CachingEnableAttribute:MoAttribute,IDisposable
 {
-    private static IServiceProvider _serviceProvider;
+    #region 需要配置的属性
+    private string _cacheKey { get; set; }
+    /// <summary>
+    /// 过期时间 秒
+    /// </summary>
+    public double? ExpireSec { get; set; }
 
+    #endregion    
+
+    private static IServiceProvider _serviceProvider;
     private IServiceScope _scope;
-    private ICacheProvider _cacheProvider;
     private readonly IRedisClient _redisClient;
     private readonly ICacheKeyGenerator _cachingKeyGenerator;
     private RedisClient.LockController _lockController;
+    private readonly CacheOptions _cacheOption;
 
-    // 启动时需要注入根服务器
     public static void SetServiceProvider(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
+    /// <summary>
+    /// 使用Redis进行缓存 不设置Key的话则默认为如下格式：
+    /// namespace:className:methodName:参数Json序列化md5
+    /// </summary>
     public CachingEnableAttribute(string customKey = "")
     {
-        CacheKey = customKey;
-        _scope = _serviceProvider.CreateScope();
-        _cacheProvider = _scope.ServiceProvider.GetRequiredService<ICacheProvider>();
-        _cacheProvider = _scope.ServiceProvider.GetRequiredService<ICacheProvider>();
+        _cacheKey = customKey;
+        _scope=_serviceProvider.CreateScope();
         _redisClient = _scope.ServiceProvider.GetRequiredService<IRedisClient>();
+        _cacheOption = _scope.ServiceProvider.GetRequiredService<CacheOptions>();
         _cachingKeyGenerator = _scope.ServiceProvider.GetRequiredService<ICacheKeyGenerator>();
     }
 
-    public string CacheKey { get; set; }
 
     public override void OnEntry(MethodContext context)
     {
-        
-        if (string.IsNullOrWhiteSpace(CacheKey))
-            CacheKey = _cachingKeyGenerator.GeneratorKey(context);
-        if (_redisClient.Exists(CacheKey))
+        if (string.IsNullOrWhiteSpace(_cacheKey))
+            _cacheKey = _cachingKeyGenerator.GeneratorKey(context);
+        if (_redisClient.Exists(_cacheKey))
         {
-            var resStr = _redisClient.Get(CacheKey);
+            var resStr = _redisClient.Get(_cacheKey);
             var realResult = string.IsNullOrWhiteSpace(resStr)?null:JsonConvert.DeserializeObject(resStr, context.RealReturnType);
             context.ReplaceReturnValue(this, realResult);
         }
@@ -47,12 +56,12 @@ public class CachingEnableAttribute:MoAttribute,IDisposable
         {
             // 并发量大需要处理缓存击穿问题 用互斥锁   
             // 超时默认10秒，如果没有获取到的话也无所谓 只要不会有大量请求跑数据库就行
-            _lockController = _redisClient.Lock("Lock" + CacheKey,10);
+            _lockController = _redisClient.Lock("Lock" + _cacheKey,10);
             //_redLock.IsAcquired 不需要这句
             // 获取锁后再判断一次，如果已经有了就不用去数据库再读了
-            if (_redisClient.Exists(CacheKey))
+            if (_redisClient.Exists(_cacheKey))
             {
-                var resStr = _redisClient.Get(CacheKey);
+                var resStr = _redisClient.Get(_cacheKey);
                 var realResult =string.IsNullOrWhiteSpace(resStr)?null:  JsonConvert.DeserializeObject(resStr, context.RealReturnType);
                 context.ReplaceReturnValue(this, realResult);
                 _lockController.Dispose();
@@ -75,6 +84,22 @@ public class CachingEnableAttribute:MoAttribute,IDisposable
         {
             try
             {
+                var expireSec = ExpireSec ?? _cacheOption.RedisCacheExpireSec;
+                var returnVal = JsonConvert.SerializeObject(context.ReturnValue);
+                if (string.IsNullOrWhiteSpace(returnVal) || context.ReturnValue == null)
+                {
+                    // 防止缓存穿透
+                    _redisClient.Set(_cacheKey, "", TimeSpan.FromSeconds(new Random().Next((int)Math.Floor(expireSec* 0.8)
+                        , (int)Math.Ceiling(expireSec * 1.2))));
+                }
+                else
+                {
+                    // 默认过期时间 加随机范围 防止雪崩
+                    _redisClient.Set(_cacheKey, returnVal,
+                    TimeSpan.FromSeconds(new Random().Next((int)Math.Floor(expireSec * 0.8)
+                        , (int)Math.Ceiling(expireSec * 1.2))));
+                }
+                _lockController?.Dispose();
             }
             finally
             {
@@ -86,7 +111,7 @@ public class CachingEnableAttribute:MoAttribute,IDisposable
 
     public void Dispose()
     {
-        _scope.Dispose();
-        _lockController.Dispose();
+        _scope?.Dispose();
+        _lockController?.Dispose();
     }
 }

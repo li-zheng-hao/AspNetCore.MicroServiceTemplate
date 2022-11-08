@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using MST.Infra.CacheProvider.Extensions;
 using MST.Infra.Configuration;
 using MST.Infra.Rpc.Rest;
 using MST.Infra.Shared;
@@ -20,6 +21,7 @@ public static class CustomApplicationBuilder
 {
     public static WebApplicationBuilder ConfigureCustomService(this WebApplicationBuilder builder)
     {
+        builder.Services.AddRedisCaching();
         builder.Services.AddScheduler();
         builder.Services.AddCustomSerilog(builder.Host,builder.Configuration,builder.Environment);
         builder.Services.AddNacosConfigurationCenter(builder.Configuration);

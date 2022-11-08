@@ -1,4 +1,5 @@
-﻿using MST.Infra.Utility.Helper;
+﻿using MST.Infra.CacheProvider.Configuration;
+using MST.Infra.Utility.Helper;
 using Newtonsoft.Json;
 using Rougamo.Context;
 
@@ -6,13 +7,12 @@ namespace MST.Infra.CacheProvider.KeyGenerator;
 
 public class DefaultCacheKeyGenerator:ICacheKeyGenerator
 {
-    public string METHOD_CACHE_PREFIX { get; } = "methodcache";
+    private readonly CacheOptions _cacheOptions;
 
-    public string GeneratorKey(string customKey)
+    public DefaultCacheKeyGenerator(CacheOptions cacheOptions)
     {
-        throw new NotImplementedException();
+        _cacheOptions = cacheOptions;
     }
-
     public string GeneratorKey(MethodContext methodContext)
     {
         string className = methodContext.TargetType.Name;
@@ -27,6 +27,6 @@ public class DefaultCacheKeyGenerator:ICacheKeyGenerator
             });
             param = ":" + EncryptHelper.Encrypt(serializeString);
         }
-        return string.Concat($"{METHOD_CACHE_PREFIX}:{className}:{methodName}", param);
+        return string.Concat($"{methodContext.TargetType.Namespace}:{className}:{methodName}:", param);
     }
 }
