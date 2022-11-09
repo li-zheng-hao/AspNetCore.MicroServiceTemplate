@@ -6,7 +6,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
-
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
       <DocumentationFile>bin\Debug\MST.User.Webapi.xml</DocumentationFile>
     </PropertyGroup>
@@ -39,7 +38,6 @@
       <ProjectReference Include="..\MST.User.Core\MST.User.Core.csproj" />
       <ProjectReference Include="..\MST.User.Repository\MST.User.Repository.csproj" />
       <ProjectReference Include="..\MST.User.Service\MST.User.Service.csproj" />
-      <ProjectReference Include="..\MST.User.Test\MST.User.Test.csproj" />
     </ItemGroup>
     <ItemGroup>
           <Content Update="skyapm.json">

@@ -1,4 +1,4 @@
-namespace MST.User.Test;
+namespace TestProject1;
 
 public class UnitTest1
 {

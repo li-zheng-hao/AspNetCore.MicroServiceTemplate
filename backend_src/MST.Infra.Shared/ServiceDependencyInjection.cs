@@ -189,7 +189,7 @@ public static class ServiceDependencyInjection
                 "[{Level}] [{TraceId}] {ENV} {Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} {Message:lj}{NewLine}{Exception}";
             configuration
 #if DEBUG
-                .MinimumLevel.Information()
+                .MinimumLevel.Debug()
 #else
             .MinimumLevel.Information()
 #endif
@@ -380,7 +380,10 @@ public static class ServiceDependencyInjection
             var xmlFile = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             //... and tell Swagger to use those XML comments.
-            c.IncludeXmlComments(xmlPath, true);
+            if (File.Exists(xmlPath))
+            {
+                c.IncludeXmlComments(xmlPath, true);
+            }
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {

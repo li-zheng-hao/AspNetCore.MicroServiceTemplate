@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using MST.Infra.Snowflake;
 
 namespace AspNetCore.StartupTemplate.Snowflake;
@@ -9,9 +10,9 @@ public static class SnowflakeDepedencyInjection
     public static IServiceCollection AddSnowflakeGenerator(this IServiceCollection service,
        IConfiguration configuration)
     {
-        service.AddSingleton<SnowflakeOptions>(sp => configuration.GetSection("Snowflake").Get<SnowflakeOptions>());
-        service.AddSingleton<SnowflakeGenerator>();
-        service.AddSingleton<SnowflakeWorkIdManager>();
+        service.TryAddSingleton<SnowflakeOptions>(sp => configuration.GetSection("Snowflake").Get<SnowflakeOptions>());
+        service.TryAddSingleton<SnowflakeGenerator>();
+        service.TryAddSingleton<SnowflakeWorkIdManager>();
         service.AddHostedService<SnowflakeBackgroundServices>();
         return service;
     }

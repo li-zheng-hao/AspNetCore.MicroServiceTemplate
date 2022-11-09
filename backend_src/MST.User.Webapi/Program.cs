@@ -4,6 +4,7 @@ using MST.Infra.Shared;
 using MST.User.Webapi;
 using MST.User.Webapi.Startup;
 using Nacos.V2.DependencyInjection;
+using Serilog;
 using Serilog.Context;
 using SkyApm.AspNetCore.Diagnostics;
 using SkyApm.Tracing;
@@ -21,6 +22,8 @@ builder.Services.AddCustomMvc();
 
 var app = builder.Build();
 
+Log.Logger.Information("当前运行环境:{EnvironmentName}", app.Environment.EnvironmentName);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -34,3 +37,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+// 暴露给集成测试项目
+public partial class Program { }
