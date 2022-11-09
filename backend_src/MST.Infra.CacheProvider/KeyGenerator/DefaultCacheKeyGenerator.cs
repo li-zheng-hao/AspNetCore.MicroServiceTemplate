@@ -27,6 +27,6 @@ public class DefaultCacheKeyGenerator:ICacheKeyGenerator
             });
             param = ":" + EncryptHelper.Encrypt(serializeString);
         }
-        return string.Concat($"{methodContext.TargetType.Namespace}:{className}:{methodName}:", param);
+        return string.Concat($"{methodContext.TargetType.Namespace}:{className}:{methodName}", param);
     }
 }

@@ -9,7 +9,7 @@ using Rougamo.Context;
 namespace MST.Infra.CacheProvider.Interceptor;
 
 [AttributeUsage(AttributeTargets.Method,AllowMultiple = false,Inherited = false)]
-public class CachingEnableAttribute:MoAttribute,IDisposable
+public class CachingEnableAttribute:MoAttribute
 {
     #region 需要配置的属性
     private string _cacheKey { get; set; }
@@ -21,12 +21,14 @@ public class CachingEnableAttribute:MoAttribute,IDisposable
     #endregion    
 
     private static IServiceProvider _serviceProvider;
-    private IServiceScope _scope;
-    private readonly IRedisClient _redisClient;
-    private readonly ICacheKeyGenerator _cachingKeyGenerator;
+    private  IRedisClient _redisClient;
+    private  ICacheKeyGenerator _cachingKeyGenerator;
     private RedisClient.LockController _lockController;
-    private readonly CacheOptions _cacheOption;
-
+    private  CacheOptions _cacheOption;
+    /// <summary>
+    /// 这里传进来的是非root级别的serviceprovider
+    /// </summary>
+    /// <param name="serviceProvider"></param>
     public static void SetServiceProvider(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
     /// <summary>
     /// 使用Redis进行缓存 不设置Key的话则默认为如下格式：
@@ -35,15 +37,14 @@ public class CachingEnableAttribute:MoAttribute,IDisposable
     public CachingEnableAttribute(string customKey = "")
     {
         _cacheKey = customKey;
-        _scope=_serviceProvider.CreateScope();
-        _redisClient = _scope.ServiceProvider.GetRequiredService<IRedisClient>();
-        _cacheOption = _scope.ServiceProvider.GetRequiredService<CacheOptions>();
-        _cachingKeyGenerator = _scope.ServiceProvider.GetRequiredService<ICacheKeyGenerator>();
     }
 
 
     public override void OnEntry(MethodContext context)
     {
+        _redisClient = _serviceProvider.GetRequiredService<IRedisClient>();
+        _cacheOption = _serviceProvider.GetRequiredService<CacheOptions>();
+        _cachingKeyGenerator =_serviceProvider.GetRequiredService<ICacheKeyGenerator>();
         if (string.IsNullOrWhiteSpace(_cacheKey))
             _cacheKey = _cachingKeyGenerator.GeneratorKey(context);
         if (_redisClient.Exists(_cacheKey))
@@ -64,16 +65,15 @@ public class CachingEnableAttribute:MoAttribute,IDisposable
                 var resStr = _redisClient.Get(_cacheKey);
                 var realResult =string.IsNullOrWhiteSpace(resStr)?null:  JsonConvert.DeserializeObject(resStr, context.RealReturnType);
                 context.ReplaceReturnValue(this, realResult);
-                _lockController.Dispose();
+                _lockController?.Dispose();
             }
         }
     }
 
-    public override void OnException(MethodContext context)
+    public override void OnExit(MethodContext context)
     {
-        this.Dispose();
+        _lockController?.Dispose();
     }
-
     public override void OnSuccess(MethodContext context)
     {
         if (typeof(Task).IsAssignableFrom(context.RealReturnType))
@@ -99,19 +99,13 @@ public class CachingEnableAttribute:MoAttribute,IDisposable
                     TimeSpan.FromSeconds(new Random().Next((int)Math.Floor(expireSec * 0.8)
                         , (int)Math.Ceiling(expireSec * 1.2))));
                 }
-                _lockController?.Dispose();
             }
             finally
             {
-                this.Dispose();
             }
         }
     }
 
 
-    public void Dispose()
-    {
-        _scope?.Dispose();
-        _lockController?.Dispose();
-    }
+  
 }

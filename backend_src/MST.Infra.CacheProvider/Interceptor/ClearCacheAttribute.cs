@@ -18,8 +18,7 @@ public class ClearCacheAttribute : Rougamo.MoAttribute
 
 
     private static IServiceProvider _serviceProvider;
-    private readonly IServiceScope _scope;
-    private readonly ICacheKeyGenerator _cacheKeyGenerator;
+    private  ICacheKeyGenerator _cacheKeyGenerator;
     public IRedisClient _redisClient { get; set; }
     public static void SetServiceProvider(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
@@ -32,25 +31,23 @@ public class ClearCacheAttribute : Rougamo.MoAttribute
     {
         IsBefore = isBefore;
         KeyPrefix = keyPrefix;
-        _scope = _serviceProvider.CreateScope();
-        _redisClient = _scope.ServiceProvider.GetRequiredService<IRedisClient>();
-        _cacheKeyGenerator = _scope.ServiceProvider.GetRequiredService<ICacheKeyGenerator>();
+     
     }
     /// <summary>
     /// 清除对应key前缀的缓存
     /// </summary>
     /// <param name="keyPrefix"></param>
-    public ClearCacheAttribute(Type type,string methodeName, bool isBefore = false)
+    public ClearCacheAttribute(Type type,string methodName, bool isBefore = false)
     {
         IsBefore = isBefore;
-        KeyPrefix = $"{type.Namespace}:{methodeName}";
-        _scope = _serviceProvider.CreateScope();
-        _redisClient = _scope.ServiceProvider.GetRequiredService<IRedisClient>();
-        _cacheKeyGenerator = _scope.ServiceProvider.GetRequiredService<ICacheKeyGenerator>();
+        KeyPrefix = $"{type.Namespace}:{type.Name}:{methodName}";
+     
     }
 
     public override void OnEntry(MethodContext context)
     {
+        _redisClient = _serviceProvider.GetRequiredService<IRedisClient>();
+        _cacheKeyGenerator = _serviceProvider.GetRequiredService<ICacheKeyGenerator>();
         // 换成在方法执行完后删除
         if (IsBefore)
             ClearCaching();
@@ -58,7 +55,6 @@ public class ClearCacheAttribute : Rougamo.MoAttribute
 
     public override void OnExit(MethodContext context)
     {
-        _scope.Dispose();    
     }
     public override void OnSuccess(MethodContext context)
     {
@@ -68,7 +64,12 @@ public class ClearCacheAttribute : Rougamo.MoAttribute
 
     private void ClearCaching()
     {
+        var res=_redisClient.Scan($"{KeyPrefix}*", 333, null).ToList();
         foreach (var keys in _redisClient.Scan($"{KeyPrefix}*", int.MaxValue, null))
+        {
+            Console.WriteLine(keys.ToString());
             _redisClient.UnLink(keys);
+
+        }
     }
 }

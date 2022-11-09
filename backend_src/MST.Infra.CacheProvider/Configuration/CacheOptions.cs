@@ -13,7 +13,7 @@ namespace MST.Infra.CacheProvider.Configuration
         /// 默认缓存时间
         /// </summary>
         [InjectConfiguration("Cache:RedisCacheExpireSec")]
-        public double RedisCacheExpireSec { get; set; } = 300;
+        public double RedisCacheExpireSec { get; set; } 
 
     }
 }

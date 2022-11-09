@@ -70,6 +70,7 @@ public static class CustomApplicationBuilder
             TransactionalAttribute.SetServiceProvider(context.RequestServices);
             await next();
         });
+        app.UseRedisCaching();
         return app;
     }
 }
