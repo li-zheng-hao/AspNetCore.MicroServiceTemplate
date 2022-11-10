@@ -23,10 +23,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="单元测试" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\MST.User.Webapi\MST.User.Webapi.csproj" />
     </ItemGroup>
 

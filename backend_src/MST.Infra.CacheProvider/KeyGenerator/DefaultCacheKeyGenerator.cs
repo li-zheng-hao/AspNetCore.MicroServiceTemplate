@@ -1,4 +1,5 @@
 ﻿using MST.Infra.CacheProvider.Configuration;
+using MST.Infra.CacheProvider.Interface;
 using MST.Infra.Utility.Helper;
 using Newtonsoft.Json;
 using Rougamo.Context;
@@ -17,15 +18,32 @@ public class DefaultCacheKeyGenerator:ICacheKeyGenerator
     {
         string className = methodContext.TargetType.Name;
         string methodName = methodContext.Method.Name;
-        List<object> methodArguments = methodContext.Arguments.ToList();
-        string param = string.Empty;
-        if (methodArguments.Count > 0)
+        List<object> argments = new();
+        
+        foreach (var methodContextArgument in methodContext.Arguments)
         {
-            string serializeString = JsonConvert.SerializeObject(methodArguments, Formatting.Indented, new JsonSerializerSettings
+            var paramType=methodContextArgument.GetType();
+            if (typeof(ICacheKey).IsAssignableFrom(paramType))
+            {
+                var cacheKey=(methodContextArgument as ICacheKey)?.ToCacheKey();
+                if (cacheKey != null && cacheKey.IsNotNullOrWhiteSpace())
+                {
+                    argments.Add(cacheKey);
+                }
+            }
+            else
+            {
+                argments.Add(methodContextArgument);
+            }
+        }
+        string param = string.Empty;
+        if (argments.Count > 0)
+        {
+            string serializeString = JsonConvert.SerializeObject(argments, Formatting.None, new JsonSerializerSettings
             {
                 DefaultValueHandling = DefaultValueHandling.Ignore
             });
-            param = ":" + EncryptHelper.Encrypt(serializeString);
+            param = $":{EncryptHelper.Encrypt(serializeString)}";
         }
         return string.Concat($"{methodContext.TargetType.Namespace}:{className}:{methodName}", param);
     }
