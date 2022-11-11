@@ -162,7 +162,7 @@ public static class ServiceDependencyInjection
             .AddHttpMessageHandler<TokenDelegatingHandler>()
             // 配置Handler
             .AddHttpMessageHandler<NacosDiscoverDelegatingHandler>();
-        clientBuilder.ConfigureHttpClient(client => client.BaseAddress = new Uri($"http://{serviceName}"));
+        clientBuilder.ConfigureHttpClient(client => client.BaseAddress = new Uri($"https://{serviceName}"));
         return collection;
     }
 

@@ -58,7 +58,6 @@ public class CachingEnableAttribute:MoAttribute
             // 并发量大需要处理缓存击穿问题 用互斥锁   
             // 超时默认10秒，如果没有获取到的话也无所谓 只要不会有大量请求跑数据库就行
             _lockController = _redisClient.Lock("Lock" + _cacheKey,10);
-            //_redLock.IsAcquired 不需要这句
             // 获取锁后再判断一次，如果已经有了就不用去数据库再读了
             if (_redisClient.Exists(_cacheKey))
             {

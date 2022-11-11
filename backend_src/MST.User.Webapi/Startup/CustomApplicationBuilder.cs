@@ -34,7 +34,7 @@ public static class CustomApplicationBuilder
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)//ids颁发的是jwt token，这里要填对应的方案
             .AddIdentityServerAuthentication(option =>
             {
-                option.Authority = "http://localhost:5000"; // AuthService的地址
+                option.Authority = "http://localhost:5001"; // AuthService的地址 TODO 这里要修改
                 option.ApiName = "UserApi"; // 和ids上配置的ApiResource要一样
                 option.RequireHttpsMetadata = false;
             });
@@ -44,7 +44,7 @@ public static class CustomApplicationBuilder
         builder.Services.ScanAssembly(typeof(CommonOptions).Assembly,it=>true);
         builder.Services.ScanAssembly(typeof(Program).Assembly,it=>true);
         builder.Services.AddFreeRepository(null, typeof(Program).Assembly);
-        
+        builder.Services.AddMapster();
         builder.Services.AddFluentValidationAutoValidation();
         builder.Services.AddValidatorsFromAssembly(typeof(Anchor).Assembly);
         

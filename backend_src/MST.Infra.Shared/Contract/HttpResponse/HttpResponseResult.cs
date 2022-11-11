@@ -27,7 +27,7 @@ public class HttpResponseResult
     {
         return new HttpResponseResult() { code = code, msg = msg,success=false,data = data};
     }
-    public static HttpResponseResult Success(object data)
+    public static HttpResponseResult Success(object? data=null)
     {
         return new HttpResponseResult() { data=data };
     }

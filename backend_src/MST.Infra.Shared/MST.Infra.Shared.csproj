@@ -51,4 +51,8 @@
       <ProjectReference Include="..\MST.Infra.Utility\MST.Infra.Utility.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Consts" />
+    </ItemGroup>
+
 </Project>

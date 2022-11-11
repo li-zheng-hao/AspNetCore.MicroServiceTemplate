@@ -1,4 +1,6 @@
 ﻿using FreeSql;
+using Mapster;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MST.Infra.Configuration;
 using MST.Infra.Model;
@@ -6,6 +8,7 @@ using MST.Infra.Shared.Contract.HttpResponse;
 using MST.User.Contract;
 using MST.User.Contract.IRepository;
 using MST.User.Contract.IService;
+using MST.User.Core.Consts;
 
 namespace MST.User.Webapi.Controllers;
 
@@ -63,5 +66,33 @@ public class UserController:ControllerBase
     {
         bool res=await _userService.TransactionQueryAndUpdateUserAsync();
         return res ? HttpResponseResult.Success("") : HttpResponseResult.Failure("");
+    }
+    /// <summary>
+    /// 创建用户
+    /// </summary>
+    /// <param name="userDto"></param>
+    /// <returns></returns>
+    [AllowAnonymous]
+    [HttpPost]
+    public async Task<HttpResponseResult> CreateUser(CreateUserDto userDto)
+    {
+        var model=userDto.Adapt<Users>();
+        var res=await _userService.AddUser(model);
+        return HttpResponseResult.Success(res.Adapt<CreateUserRespDto>());
+    }
+    /// <summary>
+    /// 更改用户权限
+    /// </summary>
+    /// <param name="changeRoleDto"></param>
+    /// <returns></returns>
+    [Authorize(UserRole.Admin)]
+    [HttpPost]
+    public async Task<HttpResponseResult> ChangeUserRole(ChangeRoleDto changeRoleDto)
+    {
+        bool changed=await _userService.ChangeUserRole(changeRoleDto);
+        if (changed)
+            return HttpResponseResult.Success();
+        else
+            return HttpResponseResult.Failure("未更新任何数据");
     }
 }

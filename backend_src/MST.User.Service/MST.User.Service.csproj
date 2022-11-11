@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\MST.Infra.Shared\MST.Infra.Shared.csproj" />
       <ProjectReference Include="..\MST.User.Contract\MST.User.Contract.csproj" />
+      <ProjectReference Include="..\MST.User.Core\MST.User.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -8,10 +8,13 @@
 
     <ItemGroup>
       <PackageReference Include="FreeSql.DbContext" Version="3.2.682" />
+      <PackageReference Include="Masuit.Tools.Core" Version="2.5.7.5" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\MST.Infra.Model\MST.Infra.Model.csproj" />
+      <ProjectReference Include="..\MST.Infra.Utility\MST.Infra.Utility.csproj" />
+      <ProjectReference Include="..\MST.User.Core\MST.User.Core.csproj" />
       <ProjectReference Include="..\MST.User.Model\MST.User.Model.csproj" />
     </ItemGroup>
 

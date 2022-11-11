@@ -36,4 +36,7 @@ public class Users
     
     [Column(Name = "role")] 
     public string Role { get; set; }
+    
+    [Column(Name = "icon")] 
+    public string Icon { get; set; }
 }

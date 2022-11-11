@@ -4,9 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MST.Infra.Model;
 using MST.Infra.Shared.Attribute;
+using MST.Infra.Shared.Exceptions;
 using MST.User.Contract;
 using MST.User.Contract.IRepository;
 using MST.User.Contract.IService;
+using MST.User.Core.Consts;
 using Quickwire.Attributes;
 
 namespace MST.User.Service;
@@ -41,6 +43,30 @@ public class UserService:IUserService
         var user = new Users()
             { Age = 1, Email = "1233123@qq.com", Role="admin",Password = password.ToSha256(), Sex = "男", UserName = username};
         return _userRepository.InsertAsync(user);
+    }
+
+    public async Task<Users> AddUser(Users user)
+    {
+        user.Role = UserRole.User;
+        try
+        {
+            var resultUser =await _userRepository.InsertAsync(user);
+            return resultUser;
+        }
+        catch (Exception e)
+        {
+            if (e.Message.Contains("Duplicate entry"))
+                throw new BusinessException("用户名重复");
+            throw;
+        }
+        
+    }
+
+    public async Task<bool> ChangeUserRole(ChangeRoleDto changeRoleDto)
+    {
+        var rows=await _userRepository.Orm.Update<Users>().Where(it => it.UserName == changeRoleDto.UserName)
+            .Set(it => it.Role, changeRoleDto.Role).ExecuteAffrowsAsync();
+        return rows > 0;
     }
 
     [Transactional]
